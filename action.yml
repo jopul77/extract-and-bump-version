@@ -1,0 +1,25 @@
+name: 'Extract and Bump Version'
+description: 'Extract APP_VERSION from code and bump version'
+inputs:
+  default_version:
+    description: 'The default version to fall back to'
+    required: true
+    default: '0.0.0'
+runs:
+  using: 'composite'
+  steps:
+    - run: echo "APP_VERSION_BASE=${{ inputs.default_version }}" >> $GITHUB_ENV
+      shell: bash
+    - run: |
+        if [[ -f "src/app/constants/constants.ts" ]]; then
+          APP_VERSION_BASE=$(grep -oP "APP_VERSION = '\K[^']+" src/app/constants/constants.ts) || APP_VERSION_BASE=${{ inputs.default_version }}
+        fi
+        if [[ "$APP_VERSION_BASE" == "0" ]] || [[ -z "$APP_VERSION_BASE" ]]; then
+          APP_VERSION_BASE=${{ inputs.default_version }}
+        fi
+        echo "APP_VERSION_BASE=$APP_VERSION_BASE" >> $GITHUB_ENV
+      shell: bash
+    - run: git tag $APP_VERSION_BASE
+      shell: bash
+    - run: git push --tags
+      shell: bash
