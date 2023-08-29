@@ -19,7 +19,3 @@ runs:
         fi
         echo "APP_VERSION_BASE=$APP_VERSION_BASE" >> $GITHUB_ENV
       shell: bash
-    - run: git tag $APP_VERSION_BASE
-      shell: bash
-    - run: git push --tags
-      shell: bash
